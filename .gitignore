@@ -1,0 +1,37 @@
+# Build artifacts
+build/
+bin/
+lib/
+objs/
+*.o
+*.a
+*.so
+*.dylib
+
+# Editor / IDE
+.vscode/
+.idea/
+.cursorindexingignore
+*.swp
+.DS_Store
+.specstory/
+
+# Python helper-script caches
+__pycache__/
+*.py[cod]
+
+# Local test outputs
+tmp/
+out/
+*.narrowPeak
+*.summits.bed
+*.bedGraph
+
+# Golden baselines (tracked) — exempt from the patterns above.
+!tests/golden/**
+
+# Local MACS3 reference builds created by benchmarks/setup_macs3_reference.sh
+.macs3-reference/
+
+# Output of benchmarks/run_10x_pbmc_example.sh
+10x_pbmc_example/

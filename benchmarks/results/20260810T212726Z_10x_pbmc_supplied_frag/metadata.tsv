@@ -1,0 +1,9 @@
+field	value
+completed_utc	2026-08-10T21:27:26Z
+dataset	10x PBMC 3k Cell Ranger ARC 2.0.0 supplied fragments
+input_archive	pbmc_unsorted_3k_atac_fragments.tsv.gz
+input_sha256	0189df1de4894f10f48ffb905da4966cefc2466dc5fdd76ee2905244dd5a8dd7
+benchmark_storage	SSD
+warmups_per_configuration	1
+recorded_repetitions	3
+macs3_version	3.0.3

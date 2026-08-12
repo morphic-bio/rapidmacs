@@ -1,0 +1,16 @@
+field	value
+started_utc	2026-08-12T15:28:04Z
+run_id	20260812T152652Z_stock_macs3_v3.0.3_atac_frag_ssd
+assays	10x_pbmc_frag bulk_atac_ENCSR095QNB_frag
+tools	macs3
+threads	1
+repeats	3
+warmups	1
+macs3_executable	macs3
+macs3_version	macs3 3.0.3
+tmp_b_c_source_line	677:        with open("tmp_b_c.txt", "w") as f:
+bulk_geometry_bp	272
+storage_source	/dev/nvme0n1p2
+storage_rotational	0
+completed_utc	2026-08-12T16:40:53Z
+final_free_bytes	9787334656

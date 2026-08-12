@@ -1,0 +1,9 @@
+input	tool	threads	n	wall_median_s	wall_min_s	wall_max_s	rss_median_kb	peaks	speedup_vs_macs3	exact_peak_and_summit_parity	narrowpeak_md5	summits_md5
+original_ENCODE_ENCFF646NWY	MACS3	1	3	146.630	146.440	147.410	1125972	74000	1.00	yes	cffa2d33d9e8b78f199e92fa8892ff7f	a61013ddfabf555b14db0ade8606cac4
+original_ENCODE_ENCFF646NWY	RapidMACS	1	3	41.490	41.410	41.530	1840164	74000	3.53	yes	cffa2d33d9e8b78f199e92fa8892ff7f	a61013ddfabf555b14db0ade8606cac4
+original_ENCODE_ENCFF646NWY	RapidMACS	4	3	13.140	13.100	13.140	2183624	74000	11.16	yes	cffa2d33d9e8b78f199e92fa8892ff7f	a61013ddfabf555b14db0ade8606cac4
+original_ENCODE_ENCFF646NWY	RapidMACS	24	3	7.280	7.280	7.400	2814004	74000	20.14	yes	cffa2d33d9e8b78f199e92fa8892ff7f	a61013ddfabf555b14db0ade8606cac4
+Chromap_FASTQ_realignment	MACS3	1	3	122.920	122.850	124.580	1116180	78574	1.00	yes	aa1cb40cadd9d5bf8f1cca00dcae0e87	e3d3ee3f541e8b1f370892f19aece20a
+Chromap_FASTQ_realignment	RapidMACS	1	3	32.100	32.080	32.110	1820304	78574	3.83	yes	aa1cb40cadd9d5bf8f1cca00dcae0e87	e3d3ee3f541e8b1f370892f19aece20a
+Chromap_FASTQ_realignment	RapidMACS	4	3	10.740	10.690	10.770	2234256	78574	11.45	yes	aa1cb40cadd9d5bf8f1cca00dcae0e87	e3d3ee3f541e8b1f370892f19aece20a
+Chromap_FASTQ_realignment	RapidMACS	24	3	6.770	6.730	6.820	2849028	78574	18.16	yes	aa1cb40cadd9d5bf8f1cca00dcae0e87	e3d3ee3f541e8b1f370892f19aece20a

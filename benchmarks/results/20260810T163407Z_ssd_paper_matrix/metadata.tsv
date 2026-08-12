@@ -1,0 +1,8 @@
+field	value
+started_utc	2026-08-10T16:34:07Z
+threads	1 4 24
+repeats	3
+warmups	1
+assays	atac cutrun chipseq
+tools	macs3 rapidmacs
+completed_utc	2026-08-10T18:13:47Z

@@ -1,0 +1,6 @@
+metric	value
+peak_count	121592
+total_peak_bp	18913550
+median_peak_width_bp	150
+argv	chromap_callpeaks -i fragments.tsv --out-prefix golden --bin-width 50 --ext-size 150 --local-window 200 --fdr 0.05 --p-value 0.01 --merge-gap 0
+params	bin_width=50 ext_size=150 local_window_bins=200 fdr=0.0500 p_value=0.0100 merge_bin_gap=0 min_peak_bp=0 min_summit_cuts=0 input=fragments.tsv

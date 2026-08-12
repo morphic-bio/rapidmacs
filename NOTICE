@@ -1,0 +1,46 @@
+RapidMACS
+Copyright (c) 2026 Ling-Hong Hung
+
+RapidMACS is distributed under the MIT License (see LICENSE).
+
+--------------------------------------------------------------------------
+Relationship to MACS3 — https://github.com/macs3-project/MACS
+Copyright (c) 2008-2024, Tao Liu lab and contributors
+BSD 3-Clause License
+--------------------------------------------------------------------------
+
+MACS was originally developed in X. Shirley Liu's group; Tao Liu and the MACS3
+contributors have maintained and extended it since. We are grateful for that
+sustained work and for the permissive licence under which it is released.
+
+RapidMACS reproduces the paired-end narrow peak-calling behaviour of
+`macs3 callpeak` v3.0.3. It is an independent implementation, not a port:
+it was written clean-room from MACS3's published algorithmic specification
+and validated by comparing its outputs against MACS3 v3.0.3 reference
+outputs. **No MACS3 code is included in this software**, in original or
+translated form, and RapidMACS is not a derivative work of MACS3.
+
+One behaviour could not be reconstructed from the specification alone: the
+per-event `pos_array` that MACS3 iterates when selecting the median member of
+a tied pileup maximum during summit calling. For that behaviour, and for
+comparable low-level details needed to reach byte-for-byte output equivalence,
+MACS3's openly available source was consulted to determine what the reference
+implementation does. The resulting RapidMACS code
+(`src/macs3_pos_array.cc`, `include/rapidmacs/macs3_pos_array.h`) was written
+independently and documents the correspondence to MACS3's
+`Pileup.quick_pileup` and `Pileup.se_all_in_one_pileup`.
+
+This notice is an acknowledgement of MACS3 and of the reference behaviour
+RapidMACS targets. It is not a claim that any part of this software is
+licensed under, or encumbered by, the BSD 3-Clause License.
+
+--------------------------------------------------------------------------
+htslib — https://github.com/samtools/htslib
+Copyright (c) Genome Research Ltd. and contributors
+MIT/Expat License
+--------------------------------------------------------------------------
+
+RapidMACS links against htslib for the Poisson tail routines in `kfunc.h` and
+for BAM I/O. htslib is referenced as a git submodule under
+`third_party/htslib` (pinned at tag 1.23) and is not redistributed in this
+source tree; its own LICENSE applies.

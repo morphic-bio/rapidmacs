@@ -1,0 +1,16 @@
+diff --git a/MACS3/Signal/PairedEndTrack.py b/MACS3/Signal/PairedEndTrack.py
+--- a/MACS3/Signal/PairedEndTrack.py
++++ b/MACS3/Signal/PairedEndTrack.py
+@@ -674,10 +674,6 @@ class PETrackI:
+             else:
+                 prev_pileup = tmp_pileup
+-
++
+-        with open("tmp_b_c.txt", "w") as f:
+-            for i in range(len(prev_pileup[0])):
+-                f.write(f"{prev_pileup[0][i]}\t{prev_pileup[1][i]}\n")
+-
+         return prev_pileup
+-
++
+     @cython.ccall
