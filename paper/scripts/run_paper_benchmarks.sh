@@ -214,9 +214,9 @@ if [[ " ${ASSAYS} " == *" chipseq "* ]]; then
   benchmark_assay chipseq "${CHIP_TREATMENT}" "${CHIP_CONTROL}" BAMPE chip chipseq_full
 fi
 
-python3 "${REPO_ROOT}/benchmarks/summarize_paper_benchmarks.py" \
+python3 "${REPO_ROOT}/paper/scripts/summarize_paper_benchmarks.py" \
   "${RAW_TSV}" "${OUT_ROOT}/summary.tsv"
-python3 "${REPO_ROOT}/benchmarks/summarize_stage_benchmarks.py" \
+python3 "${REPO_ROOT}/paper/scripts/summarize_stage_benchmarks.py" \
   "${STAGE_RAW_TSV}" "${OUT_ROOT}/stages_summary.tsv"
 echo "[benchmark] raw: ${RAW_TSV}"
 echo "[benchmark] summary: ${OUT_ROOT}/summary.tsv"

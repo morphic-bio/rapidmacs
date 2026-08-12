@@ -467,8 +467,8 @@ The reference version is pinned to MACS3 3.0.3. At the end of
 pileup to `tmp_b_c.txt`, one line per breakpoint, and then returns that same
 array to its caller. Nothing appears to read the file back and we found no
 option that disables it, so it is produced on every run that has a control and
-can write gigabytes. `benchmarks/macs3-3.0.3-no-control-dump.patch` removes the
-four lines, and `benchmarks/setup_macs3_reference.sh` builds both the released
+can write gigabytes. `paper/macs3-3.0.3-no-control-dump.patch` removes the
+four lines, and `paper/scripts/setup_macs3_reference.sh` builds both the released
 and the patched installation.
 
 **The released build is what the paper reports.** Table 1 and Supplementary S3
@@ -486,12 +486,12 @@ timed.
 ### 13.4 Reproducible harness
 
 ```bash
-benchmarks/setup_macs3_reference.sh
+paper/scripts/setup_macs3_reference.sh
 make -j
-benchmarks/run_paper_benchmarks.sh
+paper/scripts/run_paper_benchmarks.sh
 ```
 
-`benchmarks/run_paper_benchmarks.sh` writes:
+`paper/scripts/run_paper_benchmarks.sh` writes:
 
 - `raw.tsv`: every run, wall time, RSS, peak count, and four output hashes;
 - `summary.tsv`: medians and ranges by assay/tool/thread count;
@@ -509,37 +509,33 @@ version, MACS3 environment, CPU model, RAM, kernel, benchmark input checksums,
 and the complete raw result directory. No unrelated CPU- or I/O-intensive jobs
 should share the host during measurement.
 
-## 14. Final paper-ready results
+## 14. Published results
 
-The MACS3 reference matrix began at 2026-08-01 04:00:38 UTC and the final
-RapidMACS refresh ran from 06:07:35 to 06:24:21 UTC on the same
-13th-generation Intel Core i9-13900KF host. It used MACS3 3.0.3 and
-`rapidmacs` SHA-256
-`70ba7d8d5b4dc5f37aec7dc45c99b4485e0ca891644e4ff082f344717f5c1936`.
-All 36 measured invocations completed, with three runs in every summarized
-configuration. Every assay has deterministic, byte-identical full narrowPeak
-and summit hashes across tools and thread counts.
+The six input configurations reported in Table 1 of the Applications Note.
+Complete-program wall time in seconds, medians of three recorded warm-cache
+runs after one unrecorded warm-up, on one 13th-generation Intel Core i9-13900KF
+host with every input, output, and temporary file on the same NVMe device.
+Parenthesised values are speedups against that configuration's own MACS3 time.
+Within every row and every run, both programs produced byte-identical
+narrowPeak and summit files.
 
-| Assay | Tool | Threads | Median wall s (range) | Median RSS GiB | Speedup vs MACS3 | Scaling vs RapidMACS T=1 |
-|---|---|---:|---:|---:|---:|---:|
-| ATAC | MACS3 | 1 | 743.07 (740.31--746.04) | 2.397 | 1.00x | -- |
-| ATAC | RapidMACS | 1 | 59.14 (57.78--59.23) | 2.802 | 12.56x | 1.00x |
-| ATAC | RapidMACS | 4 | 24.97 (24.93--25.10) | 3.080 | 29.76x | 2.37x |
-| ATAC | RapidMACS | 24 | 15.69 (15.47--15.78) | 4.053 | 47.36x | 3.77x |
-| CUT&RUN | MACS3 | 1 | 59.58 (59.45--59.73) | 0.345 | 1.00x | -- |
-| CUT&RUN | RapidMACS | 1 | 9.73 (9.69--9.75) | 0.459 | 6.12x | 1.00x |
-| CUT&RUN | RapidMACS | 4 | 2.96 (2.96--2.97) | 0.560 | 20.13x | 3.29x |
-| CUT&RUN | RapidMACS | 24 | 2.03 (2.01--2.04) | 0.612 | 29.35x | 4.79x |
-| ChIP-seq | MACS3 | 1 | 402.49 (400.10--403.34) | 2.705 | 1.00x | -- |
-| ChIP-seq | RapidMACS | 1 | 93.60 (93.59--93.62) | 4.763 | 4.30x | 1.00x |
-| ChIP-seq | RapidMACS | 4 | 27.05 (26.99--27.06) | 4.889 | 14.88x | 3.46x |
-| ChIP-seq | RapidMACS | 24 | 11.96 (11.88--12.15) | 5.346 | 33.65x | 7.83x |
+| Configuration | MACS3 v3.0.3 | T=1 | T=4 | T=24 | Peaks |
+|---|---:|---:|---:|---:|---:|
+| scATAC-seq, 10x fragments | 747.55 | 57.87 (12.9x) | 24.13 (31.0x) | 16.37 (45.7x) | 50,003 |
+| scATAC-seq, Chromap fragments | 758.62 | 58.88 (12.9x) | 25.38 (29.9x) | 16.12 (47.1x) | 50,274 |
+| Bulk ATAC-seq, ENCODE BAM | 146.63 | 41.49 (3.5x) | 13.14 (11.2x) | 7.28 (20.1x) | 74,000 |
+| Bulk ATAC-seq, Chromap BAM | 122.92 | 32.10 (3.8x) | 10.74 (11.4x) | 6.77 (18.2x) | 78,574 |
+| ChIP-seq, ENCODE BAM + input control | 616.90 | 96.39 (6.4x) | 27.23 (22.7x) | 12.11 (50.9x) | 33,985 |
+| CUT&RUN, GEO BAM + IgG control | 64.74 | 9.81 (6.6x) | 2.98 (21.7x) | 1.99 (32.5x) | 9,097 |
 
-The MACS3 reference audit is in `build/paper_benchmarks/20260801_paper_final`;
-the corrected RapidMACS audit is in
-`build/paper_benchmarks/20260801_paper_final_scorefix`. The paper repository archives
-the raw results, summaries, stage summaries, input checksums, host metadata,
-and the exact executable hash under `benchmarks/paper_ready_*`.
+Peak resident set size spans 0.46-5.44 GiB against 0.35-2.74 GiB for MACS3.
+Internal T=1 to T=24 scaling spans 3.5-8.0x.
+
+All 72 measured invocations, every repetition with its per-run output
+checksums, the stage profiles, host metadata, and the SHA-256 of each MACS3
+executable and input are in [`paper/results/`](../paper/results/).
+[`paper/results/README.md`](../paper/results/README.md) maps each recorded run
+to the table rows it feeds, including which MACS3 build produced which.
 
 ## 15. Interpretation and limitations
 
@@ -567,5 +563,5 @@ and the exact executable hash under `benchmarks/paper_ready_*`.
 | Pipeline scheduling and release policy | `src/macs3_frag_peak_pipeline.cc` |
 | q-table, peak merging, and summit selection | `src/bdgpeakcall.cc` |
 | MACS3 `pos_array` reconstruction | `src/macs3_pos_array.cc` |
-| Full benchmark driver | `benchmarks/run_paper_benchmarks.sh` |
+| Full benchmark driver | `paper/scripts/run_paper_benchmarks.sh` |
 | Dataset provenance and fixture creation | `tests/fixtures/README.md` |

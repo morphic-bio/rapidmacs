@@ -14,9 +14,9 @@
 # Both are built from the same PyPI sdist, pinned by SHA-256.
 #
 # Usage:
-#   benchmarks/setup_macs3_reference.sh                      # both builds
-#   VARIANT=released benchmarks/setup_macs3_reference.sh
-#   VARIANT=no-control-dump benchmarks/setup_macs3_reference.sh
+#   paper/scripts/setup_macs3_reference.sh                      # both builds
+#   VARIANT=released paper/scripts/setup_macs3_reference.sh
+#   VARIANT=no-control-dump paper/scripts/setup_macs3_reference.sh
 #
 # Environment:
 #   DATA_ROOT  where to unpack sources and create venvs
@@ -59,7 +59,7 @@ build() {
   if [[ "${variant}" == no-control-dump ]]; then
     grep -q 'tmp_b_c.txt' "${track}" \
       || { echo "ERROR: sdist no longer contains the tmp_b_c.txt write" >&2; exit 1; }
-    patch -d "${src}" -p1 <"${REPO_ROOT}/benchmarks/macs3-3.0.3-no-control-dump.patch"
+    patch -d "${src}" -p1 <"${REPO_ROOT}/paper/scripts/macs3-3.0.3-no-control-dump.patch"
     if grep -q 'tmp_b_c.txt' "${track}"; then
       echo "ERROR: patch did not remove the write" >&2; exit 1
     fi

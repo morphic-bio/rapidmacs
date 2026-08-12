@@ -35,3 +35,8 @@ out/
 
 # Output of benchmarks/run_10x_pbmc_example.sh
 10x_pbmc_example/
+
+# Paper-script scratch (paths are env-driven; these are the defaults)
+work/
+archive/
+data/

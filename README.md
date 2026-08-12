@@ -111,9 +111,36 @@ BED3, bedGraph, and score columns are unaffected.
 for Poisson scoring and uses its float32 p/q-table arithmetic. Five-decimal
 rounding is confined to diagnostic bedGraph output.
 
+## Container
+
+```sh
+docker build -t rapidmacs .
+
+docker run --rm -v "$PWD:/data" rapidmacs \
+  --preset shiftTAG -f FRAG -t /data/fragments.tsv.gz -g hs -n atac \
+  -p 1e-5 --bdgpeakcall-min-len 200 --bdgpeakcall-max-gap 30 \
+  --macs3-frag-narrowpeak /data/atac.narrowPeak \
+  --macs3-frag-summits /data/atac.summits.bed
+```
+
+The default image is about 89 MB and contains only the binary and its runtime
+libraries; `rapidmacs` is the entrypoint, so arguments pass straight through.
+It links Debian's htslib rather than the pinned submodule, which affects BAM
+reading only and not peak output.
+
+`--target reproduce` builds a larger image that also carries released MACS3
+v3.0.3 and the `paper/` scripts, so the published comparison can be run inside
+the container:
+
+```sh
+docker build -t rapidmacs:reproduce --target reproduce .
+docker run --rm -it -v "$PWD:/data" rapidmacs:reproduce
+# $MACS3 and $RAPIDMACS are set; paper/scripts is on disk
+```
+
 ## Reproducing the published benchmark
 
-`benchmarks/run_10x_pbmc_example.sh` reproduces the single-cell ATAC row of
+`paper/scripts/run_10x_pbmc_example.sh` reproduces the single-cell ATAC row of
 Table 1 from a public dataset. It downloads the 10x Cell Ranger ARC PBMC 3k
 ATAC fragments, verifies the file against the SHA-256 the paper used, calls
 peaks with released MACS3 3.0.3 and with RapidMACS at 1, 4, and 24 threads, and
@@ -122,9 +149,9 @@ summits MD5 sums:
 
 ```sh
 make -j
-benchmarks/setup_macs3_reference.sh VARIANT=released
+paper/scripts/setup_macs3_reference.sh VARIANT=released
 MACS3=.macs3-reference/macs3-3.0.3-venv/bin/macs3 \
-  benchmarks/run_10x_pbmc_example.sh
+  paper/scripts/run_10x_pbmc_example.sh
 ```
 
 Expect roughly 25 minutes, nearly all of it the one MACS3 run. On the reference
@@ -134,9 +161,9 @@ RapidMACS alone against the published checksums; `WARMUPS=1 REPEATS=3`
 reproduces the paper's protocol rather than the single timed run the example
 defaults to.
 
-[benchmarks/README.md](benchmarks/README.md) covers the complete
+[paper/README.md](paper/README.md) covers the complete
 six-configuration matrix and both MACS3 reference builds.
-[benchmarks/results/](benchmarks/results/) holds every recorded measurement:
+[paper/results/](paper/results/) holds every recorded measurement:
 medians, all three repetitions with per-run output checksums, stage profiles,
 and the SHA-256 of each MACS3 executable and input.
 
@@ -149,7 +176,7 @@ three default to `macs2` and can be pointed at `macs3`; against the MACS3
 v3.0.3 commands, RapidMACS reproduces the narrowPeak and summit files byte for
 byte — 12,923 and 9,181 rows respectively on the full PBMC 100K workflow input.
 Commands and checksums are in
-[benchmarks/WORKFLOW-COMPATIBILITY.md](benchmarks/WORKFLOW-COMPATIBILITY.md).
+[paper/WORKFLOW-COMPATIBILITY.md](paper/WORKFLOW-COMPATIBILITY.md).
 
 Because the files are identical, the substitution can be made part-way through
 an established analysis without putting earlier comparisons in question.
@@ -173,11 +200,30 @@ FIXTURE_FRAGS=/path/to/fragments.tsv.gz make test-macs3-frag-100k
 
 ## Documentation
 
-- [TECHNICAL-METHODOLOGY.md](TECHNICAL-METHODOLOGY.md) — implemented
-  algorithms, parity criteria, and the benchmark protocol.
-- [benchmarks/](benchmarks/) — reproduction scripts, MACS3 reference builds,
-  and recorded results.
+- [docs/walkthroughs.md](docs/walkthroughs.md) — five worked examples, from a
+  first run to embedding the library.
+- [docs/cli.md](docs/cli.md) — complete `rapidmacs` command-line reference.
+- [docs/api.md](docs/api.md) — library API: the fragment interface, the
+  parameter struct, and the four entry points.
+- [docs/methodology.md](docs/methodology.md) — implemented algorithms, parity
+  criteria, and the benchmark protocol.
+- [paper/](paper/) — everything behind the published results: reproduction
+  scripts, both MACS3 reference builds, and the recorded measurements.
 - [NOTICE](NOTICE) — third-party attributions.
+
+## Layout
+
+```
+include/rapidmacs/  public headers
+src/                library implementation
+cli/                standalone CLI
+tests/              unit tests and parity smokes
+docs/               CLI reference, API reference, walkthroughs, methodology
+paper/
+  scripts/          every script behind a published number
+  results/          every recorded measurement
+Dockerfile          slim runtime image; --target reproduce adds MACS3 3.0.3
+```
 
 ## License
 

@@ -1,0 +1,3 @@
+assay	role	artifact	public_source	content_length_bytes	last_modified
+atac	treatment	pbmc_unsorted_3k_atac_fragments.tsv.gz	https://cf.10xgenomics.com/samples/cell-arc/2.0.0/pbmc_unsorted_3k/pbmc_unsorted_3k_atac_fragments.tsv.gz	537308082	2021-05-01T03:20:17Z
+encode_atac_ENCSR095QNB	treatment_alignment	ENCFF646NWY.bam	https://www.encodeproject.org/files/ENCFF646NWY/@@download/ENCFF646NWY.bam	2828953464	NA

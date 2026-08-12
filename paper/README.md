@@ -1,5 +1,53 @@
 # Paper benchmark protocol
 
+Everything behind the published results: the scripts that produced every
+reported number, both MACS3 reference builds, and the recorded measurements.
+
+## Paths and host guards
+
+The scripts here are the ones that were actually run. Machine-specific paths
+have been replaced by environment variables, all defaulting to directories
+under the repository so nothing outside it is touched:
+
+| Variable | Default | Holds |
+|---|---|---|
+| `DATA_DIR` | `./data` | input datasets |
+| `WORK_ROOT` | `./work` | run outputs |
+| `ARCHIVE_ROOT` | `./archive` | completed runs, copied on success |
+| `MACS3_REF_ROOT` | `./.macs3-reference` | MACS3 reference installations |
+| `CHROMAP_SUITE` | `./chromap-suite` | Chromap Suite, for the realignment scripts |
+| `CELLRANGER_REF` | `$DATA_DIR/refdata-cellranger-arc-GRCh38-2020-A-2.0.0` | Cell Ranger ARC reference |
+
+The paper's protocol also required the reference host and NVMe placement. Those
+checks are **advisory** here, so the harnesses run anywhere: they warn rather
+than abort, since timings from another machine are not comparable to the paper
+anyway. Set `STRICT_HOST=1` to restore them as hard failures.
+
+Input checksum verification is *not* relaxed. A harness still refuses to start
+against the wrong MACS3 build or an input whose SHA-256 does not match, because
+those would silently invalidate the comparison.
+
+## What produced what
+
+`results/README.md` maps each recorded run to the table rows it feeds and
+records which MACS3 build produced it. In outline:
+
+| Script | Produces |
+|---|---|
+| `scripts/run_10x_pbmc_example.sh` | The single-dataset reproduction. Start here. |
+| `scripts/setup_macs3_reference.sh` | Both MACS3 reference builds |
+| `scripts/run_paper_benchmarks.sh` | The full assay matrix |
+| `scripts/run_stock_macs3_controlled_ssd.sh` | Released-build ChIP-seq and CUT&RUN baselines |
+| `scripts/run_stock_macs3_atac_frag_ssd.sh` | Released-build scATAC baselines |
+| `scripts/run_encode_bulk_atac_*.sh` | Bulk ATAC rows |
+| `scripts/run_treatment_only_frag_benchmarks.sh` | Treatment-only fragment runs |
+| `scripts/stage_*.sh`, `scripts/prepare_fastq_fragments.sh` | Input staging and Chromap realignment |
+| `scripts/run_workflow_*.sh` | The Signac / ArchR / pycisTopic audit in `WORKFLOW-COMPATIBILITY.md` |
+| `scripts/summarize_*.py` | Medians and ranges from raw run output |
+
+`fastq_sources.tsv` and `fragment_sources.tsv` record the accessions and
+checksums of every input.
+
 The real-world Signac/ArchR/pycisTopic and paired-end duplicate-retention audit
 is recorded in `WORKFLOW-COMPATIBILITY.md`; its three reusable command harnesses
 are named `run_workflow_*_parity.sh` and `run_workflow_tool_audit.sh`.
@@ -32,9 +80,9 @@ MD5 sums:
 
 ```bash
 make -j
-benchmarks/setup_macs3_reference.sh VARIANT=released
+paper/scripts/setup_macs3_reference.sh VARIANT=released
 MACS3=.macs3-reference/macs3-3.0.3-venv/bin/macs3 \
-  benchmarks/run_10x_pbmc_example.sh
+  paper/scripts/run_10x_pbmc_example.sh
 ```
 
 Budget about 25 minutes, most of it the single MACS3 run. `SKIP_MACS3=1` times
@@ -45,7 +93,7 @@ timed run the example defaults to.
 ## Building the MACS3 references
 
 ```bash
-benchmarks/setup_macs3_reference.sh
+paper/scripts/setup_macs3_reference.sh
 ```
 
 This builds two installations from the same SHA-256-pinned PyPI sdist:
@@ -61,13 +109,13 @@ builds produce identical narrowPeak and summits output.
 **The released build is what Table 1 and Supplementary S3 report.** The
 no-control-dump build appears in Supplementary S4, which gives both side by
 side, and produced the three treatment-only configurations, where that code is
-never reached. `results/README.md` records which build produced which row.
+never reached. `paper/results/README.md` records which build produced which row.
 
 Run the complete six-configuration matrix:
 
 ```bash
 make -j
-benchmarks/run_paper_benchmarks.sh
+paper/scripts/run_paper_benchmarks.sh
 ```
 
 Useful controlled reductions are available through environment variables,
@@ -85,7 +133,7 @@ oracle instead of rerunning the unchanged reference caller:
 TOOLS=rapidmacs \
 REFERENCE_RAW_TSV=/path/to/previous/raw.tsv \
 ASSAYS='chipseq cutrun' \
-benchmarks/run_paper_benchmarks.sh
+paper/scripts/run_paper_benchmarks.sh
 ```
 
 This mode still performs the configured warm-ups and repetitions and applies
@@ -96,7 +144,7 @@ the same assay-specific parity checks. Reused ATAC references must include the
 
 `results/` holds every recorded measurement behind the paper: medians, all
 three repetitions, per-run output checksums, stage profiles, host metadata, and
-the SHA-256 of each MACS3 executable and input. `results/README.md` maps each
+the SHA-256 of each MACS3 executable and input. `paper/results/README.md` maps each
 run directory to the table rows it feeds.
 
 Each recorded run was driven by a harness that refuses to start against the

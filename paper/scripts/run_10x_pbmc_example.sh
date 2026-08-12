@@ -7,7 +7,7 @@
 # non-zero if any checksum disagrees.
 #
 # Usage:
-#   benchmarks/run_10x_pbmc_example.sh
+#   paper/scripts/run_10x_pbmc_example.sh
 #
 # Environment:
 #   WORK_DIR    scratch + output directory (default ./10x_pbmc_example)
@@ -62,7 +62,7 @@ if [[ "${SKIP_MACS3}" != 1 ]]; then
   command -v "${MACS3}" >/dev/null 2>&1 || die "macs3 not found; set MACS3=/path/to/macs3, or SKIP_MACS3=1"
   macs3_version="$("${MACS3}" --version 2>&1 | awk 'NR == 1 {print $NF}')"
   [[ "${macs3_version}" == 3.0.3 ]] \
-    || die "expected MACS3 3.0.3, found ${macs3_version}. See benchmarks/setup_macs3_reference.sh"
+    || die "expected MACS3 3.0.3, found ${macs3_version}. See paper/scripts/setup_macs3_reference.sh"
 fi
 
 mkdir -p "${WORK_DIR}/runs"

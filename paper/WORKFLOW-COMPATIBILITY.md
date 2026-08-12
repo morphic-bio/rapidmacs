@@ -37,7 +37,7 @@ The effective default invocation is BED, human genome size 2.7e9, q=0.05,
 Recorded outputs are under
 `build/workflow_compatibility/20260811T152047Z_phase1_signac/`. The commands
 are preserved in both `macs3/time.txt` and `rapidmacs/time.txt`; the reusable
-harness is `benchmarks/run_workflow_signac_parity.sh`.
+harness is `paper/scripts/run_workflow_signac_parity.sh`.
 
 ## Phase 2: paired-end duplicate retention
 
@@ -62,7 +62,7 @@ warning and is overridden to `all`.
 | CUT&RUN | BEDPE | 2 | 18,532 | `9d3cb36e63962f60f0e974d4fc5b395c` | `691a88c8649841b8af87fbdfd9ad4d2d` | pass |
 | CUT&RUN | BEDPE | all | 29,176 | `664df8bbd7ced22fd6f429d4b51b9fe2` | `958c1bb6dcc190877b07b7764309660a` | pass |
 
-Harness: `benchmarks/run_workflow_keepdup_parity.sh`. Final results and exact
+Harness: `paper/scripts/run_workflow_keepdup_parity.sh`. Final results and exact
 shell-escaped commands are under
 `build/workflow_compatibility/20260811_phase2_keepdup/` in `results.tsv` and
 `commands.sh`.
@@ -104,7 +104,7 @@ Summits MD5s for the two blocked comparisons are:
 | ArchR | `9ea1ee52175d7d5930d8c3c9b7dd9dd4` | `b681f8239bdec744f91c918a81a71246` |
 | pycisTopic | `090a329741c87fb894f446f5de279376` | `7b0efb2a7635f45796d62c1b00178bcc` |
 
-Harness: `benchmarks/run_workflow_tool_audit.sh`. Outputs, full MD5 inputs,
+Harness: `paper/scripts/run_workflow_tool_audit.sh`. Outputs, full MD5 inputs,
 and exact commands are under
 `build/workflow_compatibility/20260811_phase3_tool_audit/`.
 
@@ -135,7 +135,7 @@ For both workflows the row count, full 10-column narrowPeak MD5, BED3, and
 full summits BED MD5 equal MACS3. Results, the reference pointer, stderr, and
 fully expanded commands are under
 `build/workflow_compatibility/20260811_phase4_flags/`. The reusable harness is
-`benchmarks/run_workflow_tool_audit.sh`; set `MACS_REFERENCE_ROOT` to a prior
+`paper/scripts/run_workflow_tool_audit.sh`; set `MACS_REFERENCE_ROOT` to a prior
 completed audit to reuse its unchanged MACS3 files.
 
 An additional controlled BAMPE check used the committed CUT&RUN chr21 fixtures
