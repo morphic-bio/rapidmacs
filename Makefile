@@ -15,7 +15,17 @@ AR ?= ar
 # a built copy of third_party/htslib (or any other htslib install).
 HTSLIB_DIR ?=
 
-CXXFLAGS ?= -std=c++11 -Wall -Wextra -O3 -fopenmp -msse4.1
+# -msse4.1 is an x86 flag and aarch64 compilers reject it. No source file uses
+# SSE intrinsics, so it is simply omitted off x86; the build is portable.
+# Override CXXFLAGS entirely to take control.
+BUILD_ARCH := $(shell uname -m)
+ifneq (,$(filter x86_64 amd64 i386 i686,$(BUILD_ARCH)))
+ARCH_CXXFLAGS := -msse4.1
+else
+ARCH_CXXFLAGS :=
+endif
+
+CXXFLAGS ?= -std=c++11 -Wall -Wextra -O3 -fopenmp $(ARCH_CXXFLAGS)
 CPPFLAGS_LOCAL = -Iinclude
 DEPFLAGS = -MMD -MP
 LDFLAGS_LOCAL = -lhts -lm -lz -lpthread -fopenmp

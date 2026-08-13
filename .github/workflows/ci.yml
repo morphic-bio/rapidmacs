@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: build and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential libhts-dev zlib1g-dev
+
+      - name: Build
+        run: make -j"$(nproc)"
+
+      - name: Test
+        run: make test
+
+      # The 100K fragment fixture is not redistributable, so those two smokes
+      # skip. Fail the job if that ever becomes silent — a skip that turns into
+      # a pass would hide a real regression.
+      - name: Confirm the fixture-dependent smokes reported a skip
+        run: |
+          make test 2>&1 | tee test.log
+          grep -q "SKIP: 100K fragments fixture not present" test.log
+
+  documented-examples:
+    name: documented examples compile
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential libhts-dev zlib1g-dev python3
+
+      - name: Build the library
+        run: make -j"$(nproc)"
+
+      # Every C++ example in docs/ is extracted and compiled as written. This
+      # is what catches documentation that has drifted from the headers.
+      - name: Extract and compile the examples in docs/
+        run: |
+          python3 - <<'PY'
+          import re, pathlib
+          out = pathlib.Path("build/doc-examples")
+          out.mkdir(parents=True, exist_ok=True)
+          found = 0
+          for md in pathlib.Path("docs").glob("*.md"):
+              for i, block in enumerate(re.findall(r"```cpp\n(.*?)\n```", md.read_text(), re.S)):
+                  if "int main()" not in block:
+                      continue
+                  (out / f"{md.stem}_{i}.cc").write_text(block + "\n")
+                  found += 1
+          assert found, "no compilable examples found in docs/ -- did the fences change?"
+          print(f"extracted {found} example(s)")
+          PY
+          for f in build/doc-examples/*.cc; do
+            echo "compiling $f"
+            g++ -std=c++11 -Iinclude "$f" lib/librapidmacs.a \
+              -lhts -lm -lz -lpthread -fopenmp -o "${f%.cc}"
+          done
+
+  shellcheck:
+    name: shell scripts parse
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: bash -n every script
+        run: |
+          status=0
+          while IFS= read -r f; do
+            bash -n "$f" || { echo "SYNTAX ERROR: $f"; status=1; }
+          done < <(find . -name '*.sh' -not -path './third_party/*')
+          exit "$status"
+
+  container:
+    name: container (${{ matrix.platform }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build the runtime image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          push: false
+          load: true
+          tags: rapidmacs:ci
+
+      # A container that builds but cannot run is not a working container.
+      - name: Run it
+        run: docker run --rm --platform ${{ matrix.platform }} rapidmacs:ci --help

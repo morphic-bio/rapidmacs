@@ -1,0 +1,174 @@
+name: Release
+
+# Tag a release to publish it:
+#   git tag -a v1.0.0 -m "RapidMACS 1.0.0" && git push origin v1.0.0
+#
+# Produces, for that tag:
+#   - a multi-arch container on ghcr.io/<owner>/rapidmacs
+#   - static-ish amd64 and arm64 tarballs of the binary, library and headers
+#   - a GitHub release carrying both, with SHA-256 sums
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build (must already exist)'
+        required: true
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  # Never publish a release from a tree that does not build and pass its tests.
+  verify:
+    name: build and test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential libhts-dev zlib1g-dev
+      - run: make -j"$(nproc)"
+      - run: make test
+
+  artifacts:
+    name: artifacts (${{ matrix.arch }})
+    needs: verify
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            platform: linux/amd64
+          - arch: arm64
+            platform: linux/arm64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      # Build inside the release container so the artifact matches what the
+      # image ships, rather than whatever the runner happens to have.
+      - name: Build for ${{ matrix.arch }}
+        run: |
+          docker buildx build --platform ${{ matrix.platform }} \
+            --target builder --load -t rapidmacs-build:${{ matrix.arch }} .
+          id="$(docker create --platform ${{ matrix.platform }} rapidmacs-build:${{ matrix.arch }})"
+          mkdir -p stage/rapidmacs
+          docker cp "$id:/src/bin/rapidmacs" stage/rapidmacs/
+          docker cp "$id:/src/lib/librapidmacs.a" stage/rapidmacs/
+          docker rm "$id" >/dev/null
+          cp -r include stage/rapidmacs/include
+          cp LICENSE NOTICE README.md stage/rapidmacs/
+          cp -r docs stage/rapidmacs/docs
+
+      - name: Package
+        id: package
+        run: |
+          version="${GITHUB_REF_NAME:-${{ github.event.inputs.tag }}}"
+          name="rapidmacs-${version}-linux-${{ matrix.arch }}"
+          mv stage/rapidmacs "stage/${name}"
+          tar -C stage -czf "${name}.tar.gz" "${name}"
+          sha256sum "${name}.tar.gz" > "${name}.tar.gz.sha256"
+          echo "name=${name}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package.outputs.name }}
+          path: |
+            *.tar.gz
+            *.tar.gz.sha256
+
+  container:
+    name: publish container
+    needs: verify
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tags and labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+
+      - name: Build and push (amd64 + arm64)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  release:
+    name: create the release
+    needs: [artifacts, container]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          generate_release_notes: true
+          files: |
+            dist/*.tar.gz
+            dist/*.tar.gz.sha256
+          body: |
+            RapidMACS ${{ github.event.inputs.tag || github.ref_name }} — narrow peak
+            calling with output byte-identical to MACS3 v3.0.3.
+
+            **Container**
+
+            ```sh
+            docker pull ghcr.io/${{ github.repository }}:${{ github.event.inputs.tag || github.ref_name }}
+            ```
+
+            Multi-arch (amd64 and arm64). `rapidmacs` is the entrypoint.
+
+            **Tarballs**
+
+            `rapidmacs-<version>-linux-<arch>.tar.gz` carries the binary, the
+            static library, the public headers, and the documentation. Verify
+            with the accompanying `.sha256`.
+
+            **Reproducing the published benchmark**
+
+            See `paper/README.md`. `paper/scripts/run_10x_pbmc_example.sh`
+            reproduces the single-cell ATAC row of Table 1 from a public
+            dataset and fails unless the output matches the published
+            checksums.

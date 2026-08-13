@@ -128,6 +128,10 @@ libraries; `rapidmacs` is the entrypoint, so arguments pass straight through.
 It links Debian's htslib rather than the pinned submodule, which affects BAM
 reading only and not peak output.
 
+Tagged releases publish a multi-arch image (amd64 and arm64) to
+`ghcr.io/morphic-bio/rapidmacs`, alongside per-architecture tarballs of the
+binary, static library, and headers.
+
 `--target reproduce` builds a larger image that also carries released MACS3
 v3.0.3 and the `paper/` scripts, so the published comparison can be run inside
 the container:
