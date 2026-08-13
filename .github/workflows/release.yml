@@ -64,9 +64,9 @@ jobs:
           docker buildx build --platform ${{ matrix.platform }} \
             --target builder --load -t rapidmacs-build:${{ matrix.arch }} .
           id="$(docker create --platform ${{ matrix.platform }} rapidmacs-build:${{ matrix.arch }})"
-          mkdir -p stage/rapidmacs
-          docker cp "$id:/src/bin/rapidmacs" stage/rapidmacs/
-          docker cp "$id:/src/lib/librapidmacs.a" stage/rapidmacs/
+          mkdir -p stage/rapidmacs/bin stage/rapidmacs/lib
+          docker cp "$id:/src/bin/rapidmacs" stage/rapidmacs/bin/
+          docker cp "$id:/src/lib/librapidmacs.a" stage/rapidmacs/lib/
           docker rm "$id" >/dev/null
           cp -r include stage/rapidmacs/include
           cp LICENSE NOTICE README.md stage/rapidmacs/
@@ -162,9 +162,16 @@ jobs:
 
             **Tarballs**
 
-            `rapidmacs-<version>-linux-<arch>.tar.gz` carries the binary, the
-            static library, the public headers, and the documentation. Verify
-            with the accompanying `.sha256`.
+            `rapidmacs-<version>-linux-<arch>.tar.gz` unpacks to `bin/rapidmacs`,
+            `lib/librapidmacs.a`, `include/rapidmacs/`, and `docs/`. Verify with
+            the accompanying `.sha256`.
+
+            ```sh
+            tar xzf rapidmacs-<version>-linux-<arch>.tar.gz
+            g++ -std=c++11 -Irapidmacs-<version>-linux-<arch>/include my_tool.cc \\
+              rapidmacs-<version>-linux-<arch>/lib/librapidmacs.a \\
+              -lhts -lm -lz -lpthread -fopenmp
+            ```
 
             **Reproducing the published benchmark**
 
