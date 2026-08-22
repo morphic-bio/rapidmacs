@@ -204,6 +204,8 @@ FIXTURE_FRAGS=/path/to/fragments.tsv.gz make test-macs3-frag-100k
 
 ## Documentation
 
+- [docs/RELEASE_NOTES_v1.0.1.md](docs/RELEASE_NOTES_v1.0.1.md) — correctness
+  fixes in the v1.0.1 patch release.
 - [docs/walkthroughs.md](docs/walkthroughs.md) — five worked examples, from a
   first run to embedding the library.
 - [docs/cli.md](docs/cli.md) — complete `rapidmacs` command-line reference.

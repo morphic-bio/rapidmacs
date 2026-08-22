@@ -48,6 +48,10 @@ struct Macs3FragPeakPipelineParams {
   // subpeak algorithm. False preserves the established single-summit output.
   bool call_summits = false;
   double score_pseudocount = 0.0;
+  // MACS3 callpeak applies PeakIO.filter_fc after region/summit calling.
+  // Its default is 1.0, which removes statistically significant depletion
+  // regions (treatment < local lambda) from the final peak files.
+  double fold_enrichment_cutoff = 1.0;
   int peak_caller_threads = 1;
   // If non-empty, peaks are named "<name_prefix>_peak_<N>" (matches MACS3
   // callpeak's `-n NAME` convention). Otherwise "peak_<N>".
