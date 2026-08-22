@@ -69,7 +69,8 @@ bool RunMacs3FragPpoisNarrowPeaksFromTracks(
     bool cutoff_is_qvalue = false,
     bool macs3_float_qvalue_math = false,
     const std::vector<std::vector<int32_t>>* pos_array_positions = nullptr,
-    bool call_summits = false);
+    bool call_summits = false,
+    double fold_enrichment_cutoff = 0.0);
 
 // Compatibility overload used by the MACS3 BED/Signac profile and by callers
 // of the previously published q-value threshold API.
@@ -128,6 +129,12 @@ bool WriteMacs3FragNarrowPeakRows(
     const std::map<double, double>* p_to_q = nullptr,
     const std::string& name_prefix = "",
     bool narrowpeak_score_is_qvalue = false);
+
+// MACS3 callpeak filters completed peaks by summit fold enrichment after peak
+// calling. A non-positive cutoff disables filtering for lower-level
+// bdgpeakcall-compatible callers.
+void FilterMacs3FragNarrowPeakRowsByFoldEnrichment(
+    std::vector<Macs3FragNarrowPeakRow>* rows, double cutoff);
 
 bool WriteMacs3FragNarrowPeakRowsWithScoreCap(
     std::vector<Macs3FragNarrowPeakRow>* rows,

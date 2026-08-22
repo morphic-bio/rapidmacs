@@ -124,7 +124,9 @@ bool RunMacs3FragPeakPipelineFromFragments(
   }
   if (params.min_length < 1 || params.max_gap < 0 || params.slocal_bp < 0 ||
       params.llocal_bp < 1 || params.slocal_bp > params.llocal_bp ||
-      params.effective_genome_size < 1 || params.peak_caller_threads < 1) {
+      params.effective_genome_size < 1 || params.peak_caller_threads < 1 ||
+      std::isnan(params.fold_enrichment_cutoff) ||
+      params.fold_enrichment_cutoff < 0.0) {
     return fail("invalid MACS3 FRAG peak pipeline numeric parameters");
   }
   float threshold_cutoff = 0.f;
@@ -377,7 +379,7 @@ bool RunMacs3FragPeakPipelineFromFragments(
             workspace.params.byte_parity_summits
                 ? &workspace.pos_array_positions
                 : nullptr,
-            params.call_summits)) {
+            params.call_summits, params.fold_enrichment_cutoff)) {
       if (own_workdir) {
         RemoveTree(work);
       }
@@ -460,6 +462,8 @@ bool RunMacs3FragPeakPipelineFromFragments(
     for (auto& chrom_rows : rows_by_chrom) {
       rows.insert(rows.end(), chrom_rows.begin(), chrom_rows.end());
     }
+    FilterMacs3FragNarrowPeakRowsByFoldEnrichment(
+        &rows, params.fold_enrichment_cutoff);
     if (stage_profile) {
       t_regions_start = StageProfileCollector::Now();
       stage_profile->Record("finalize_ppois_tracks", t_ppois_start, t_regions_start,
@@ -711,7 +715,9 @@ bool RunMacs3FragPeakPipelineFromWorkspace(
   }
   if (params.min_length < 1 || params.max_gap < 0 || params.slocal_bp < 0 ||
       params.llocal_bp < 1 || params.slocal_bp > params.llocal_bp ||
-      params.effective_genome_size < 1 || params.peak_caller_threads < 1) {
+      params.effective_genome_size < 1 || params.peak_caller_threads < 1 ||
+      std::isnan(params.fold_enrichment_cutoff) ||
+      params.fold_enrichment_cutoff < 0.0) {
     return fail("invalid MACS3 FRAG peak pipeline numeric parameters");
   }
   float threshold_cutoff = 0.f;
@@ -931,7 +937,7 @@ bool RunMacs3FragPeakPipelineFromWorkspace(
             workspace->params.byte_parity_summits
                 ? &workspace->pos_array_positions
                 : nullptr,
-            params.call_summits)) {
+            params.call_summits, params.fold_enrichment_cutoff)) {
       cleanup_on_fail();
       return fail("RunMacs3FragPpoisNarrowPeaks failed");
     }
@@ -1025,6 +1031,8 @@ bool RunMacs3FragPeakPipelineFromWorkspace(
     for (auto& chrom_rows : rows_by_chrom) {
       rows.insert(rows.end(), chrom_rows.begin(), chrom_rows.end());
     }
+    FilterMacs3FragNarrowPeakRowsByFoldEnrichment(
+        &rows, params.fold_enrichment_cutoff);
     if (stage_profile) {
       const auto tk1 = StageProfileCollector::Now();
       stage_profile->Record("bdgpeakcall_regions", tk0, tk1, n_frag_rows,

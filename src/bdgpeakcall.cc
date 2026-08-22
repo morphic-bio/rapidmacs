@@ -123,6 +123,9 @@ void CallPeaksOnTrack(const Macs3BdgTrack& tr, float cutoff, int32_t min_length,
   std::vector<char> above(n);
   size_t n_above = 0;
   for (size_t i = 0; i < n; ++i) {
+    // MACS3 BedGraph/ScoreTrack bdgpeakcall includes values equal to the
+    // cutoff. This diagnostic path intentionally differs from callpeak's
+    // CallPeakUnit thresholding below, which uses a strict comparison.
     above[i] = (tr.v[i] >= cutoff) ? 1 : 0;
     if (above[i]) {
       ++n_above;
@@ -291,7 +294,7 @@ void CallPpoisTrackMergedRegions(
     // pscore key that passes instead of materializing a duplicate q track or
     // performing a map lookup for every genomic run.
     for (const auto& kv : *p_to_q) {
-      if (static_cast<float>(kv.second) >= cutoff) {
+      if (static_cast<float>(kv.second) > cutoff) {
         pscore_cutoff = kv.first;
         break;
       }
@@ -302,7 +305,9 @@ void CallPpoisTrackMergedRegions(
   for (size_t i = 0; i < n; ++i) {
     bool pass = false;
     if (p_to_q == nullptr) {
-      pass = tr.v[i] >= cutoff;
+      // MACS3 CallPeakUnit.apply_multiple_cutoffs uses score > cutoff for
+      // both p- and q-value modes. Equality must not enter a peak region.
+      pass = tr.v[i] > cutoff;
     } else if (std::isfinite(pscore_cutoff)) {
       const double key =
           pscore_keys_are_float
@@ -488,11 +493,12 @@ bool RunMacs3FragPpoisNarrowPeaksFromTracks(
     const std::string& name_prefix, bool cutoff_is_qvalue,
     bool macs3_float_qvalue_math,
     const std::vector<std::vector<int32_t>>* pos_array_positions,
-    bool call_summits) {
+    bool call_summits, double fold_enrichment_cutoff) {
   if ((path_narrowpeak.empty() && path_summits_bed.empty()) || min_length < 1 ||
       max_gap < 0 || chrom_names.size() != ppois_tracks.size() ||
       chrom_names.size() != treat_tracks.size() ||
       chrom_names.size() != lambda_tracks.size() ||
+      std::isnan(fold_enrichment_cutoff) || fold_enrichment_cutoff < 0.0 ||
       (pos_array_positions != nullptr &&
        chrom_names.size() != pos_array_positions->size())) {
     return false;
@@ -521,6 +527,8 @@ bool RunMacs3FragPpoisNarrowPeaksFromTracks(
       return false;
     }
   }
+  FilterMacs3FragNarrowPeakRowsByFoldEnrichment(
+      &w, fold_enrichment_cutoff);
   StageProfileCollector::Tick t_np_start{};
   if (stage_profile) {
     const int64_t in_fr =
@@ -1300,6 +1308,19 @@ bool WriteMacs3FragNarrowPeakRows(
     }
   }
   return true;
+}
+
+void FilterMacs3FragNarrowPeakRowsByFoldEnrichment(
+    std::vector<Macs3FragNarrowPeakRow>* rows, double cutoff) {
+  if (rows == nullptr || !(cutoff > 0.0)) {
+    return;
+  }
+  rows->erase(
+      std::remove_if(rows->begin(), rows->end(),
+                     [cutoff](const Macs3FragNarrowPeakRow& row) {
+                       return row.fc < cutoff;
+                     }),
+      rows->end());
 }
 
 }  // namespace peaks
