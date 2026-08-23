@@ -279,18 +279,20 @@ benchmark_assay chipseq "${CHIP_TREATMENT}" "${CHIP_CONTROL}" chipseq_full \
 
 python3 "${REPO_ROOT}/paper/scripts/summarize_paper_benchmarks.py" \
   "${RAW_TSV}" "${OUT_ROOT}/summary.tsv"
+# The RapidMACS comparators below are the reported v1.0.1 medians, so the
+# convenience summary this writes stays consistent with the paper.
 awk -F '\t' 'BEGIN {
     OFS="\t";
     print "assay", "macs3_median_s", "rapidmacs_t1_s", "speedup_t1", \
           "rapidmacs_t4_s", "speedup_t4", "rapidmacs_t24_s", "speedup_t24"
   }
   NR > 1 && $1 == "chipseq" {
-    printf "chipseq\t%.3f\t96.39\t%.1f\t27.23\t%.1f\t12.11\t%.1f\n", \
-           $5, $5/96.39, $5/27.23, $5/12.11
+    printf "chipseq\t%.3f\t97.08\t%.1f\t27.38\t%.1f\t12.18\t%.1f\n", \
+           $5, $5/97.08, $5/27.38, $5/12.18
   }
   NR > 1 && $1 == "cutrun" {
-    printf "cutrun\t%.3f\t9.81\t%.1f\t2.98\t%.1f\t1.99\t%.1f\n", \
-           $5, $5/9.81, $5/2.98, $5/1.99
+    printf "cutrun\t%.3f\t9.94\t%.1f\t2.99\t%.1f\t2.01\t%.1f\n", \
+           $5, $5/9.94, $5/2.99, $5/2.01
   }' "${OUT_ROOT}/summary.tsv" >"${OUT_ROOT}/speedups.tsv"
 
 chip_t24_speedup="$(awk -F '\t' '$1 == "chipseq" {print $8}' "${OUT_ROOT}/speedups.tsv")"

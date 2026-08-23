@@ -159,8 +159,8 @@ MACS3=.macs3-reference/macs3-3.0.3-venv/bin/macs3 \
 ```
 
 Expect roughly 25 minutes, nearly all of it the one MACS3 run. On the reference
-host this configuration is 747.55 s for MACS3 against 57.87, 24.13, and 16.37 s
-for RapidMACS, all four producing 50,003 identical peaks. `SKIP_MACS3=1` times
+host this configuration is 747.55 s for MACS3 against 58.93, 24.44, and 16.35 s
+for RapidMACS v1.0.1, all four producing 50,003 identical peaks. `SKIP_MACS3=1` times
 RapidMACS alone against the published checksums; `WARMUPS=1 REPEATS=3`
 reproduces the paper's protocol rather than the single timed run the example
 defaults to.

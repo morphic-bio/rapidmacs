@@ -1,8 +1,17 @@
 # Recorded benchmark results
 
-Every measurement reported in the paper, as the harness wrote it. Files are
-verbatim copies from the run archives — paths inside them are the ones the runs
-actually used, and are left unedited so the records stay checkable.
+Every measurement reported in the paper, as the harness wrote it.
+
+**The RapidMACS timings in the paper are v1.0.1**, from
+`20260822T000000Z_rapidmacs_v1.0.1_refresh`. The MACS3 comparators are
+unchanged by that release and were not relaunched, so the MACS3 medians below
+remain the reported baselines. Peak counts and every output MD5 are identical
+between v1.0.0 and v1.0.1, so the identity table in Supplementary S1 covers
+both. The v1.0.0 RapidMACS directories are kept as the record of that release
+and are no longer the reported timings.
+
+Files are copies from the run archives, with absolute paths reduced to their
+basenames; no measurement, checksum or count has been altered.
 
 `summary.tsv` / `comparison.tsv` give medians with the observed range;
 `raw.tsv` retains all three recorded repetitions with the per-run narrowPeak,
@@ -17,11 +26,12 @@ checksums here identify them exactly.
 
 | Directory | Configurations | MACS3 build | Feeds |
 |---|---|---|---|
-| `20260810T163407Z_ssd_paper_matrix` | scATAC Chromap; ChIP-seq; CUT&RUN | no-control-dump | Table 1 row 2; the RapidMACS columns of rows 5–6; the "extra file removed" rows of S4; all of S5 |
-| `20260810T201105Z_encode_bulk_atac_bampe` | Bulk ATAC, ENCODE BAM and Chromap BAM | no-control-dump (treatment-only, so the write is unreachable) | Table 1 rows 3–4 |
-| `20260810T212726Z_10x_pbmc_supplied_frag` | scATAC, 10x fragments | no-control-dump (treatment-only) | Table 1 row 1, RapidMACS columns. Its MACS3 time of 748.49 s is superseded by the released-build run below |
+| `20260810T163407Z_ssd_paper_matrix` | scATAC Chromap; ChIP-seq; CUT&RUN | no-control-dump | Table 1 row 2, MACS3 column; the MACS3 walls of S4's "extra file removed" rows. Its RapidMACS timings are superseded by the v1.0.1 refresh |
+| `20260810T201105Z_encode_bulk_atac_bampe` | Bulk ATAC, ENCODE BAM and Chromap BAM | no-control-dump (treatment-only, so the write is unreachable) | Table 1 rows 3–4, MACS3 column. RapidMACS timings superseded |
+| `20260810T212726Z_10x_pbmc_supplied_frag` | scATAC, 10x fragments | no-control-dump (treatment-only) | Historical only. Its MACS3 time of 748.49 s is superseded by the released-build run below, and its RapidMACS timings by the v1.0.1 refresh |
 | `20260811T194844Z_released_macs3_controlled` | ChIP-seq; CUT&RUN | **released** | Table 1 rows 5–6, MACS3 column; the "as released" rows of S4 |
-| `20260812T152652Z_released_macs3_atac_frag` | scATAC 10x; bulk ATAC Chromap fragments | **released** | Table 1 row 1, MACS3 column |
+| `20260812T152652Z_released_macs3_atac_frag` | scATAC 10x; bulk ATAC Chromap fragments | **released** | Table 1 row 1, MACS3 column; the 0.13% released-vs-patched bound quoted in S2 |
+| `20260822T000000Z_rapidmacs_v1.0.1_refresh` | All six, RapidMACS only | n/a (MACS3 not relaunched) | **Every RapidMACS timing in the paper: the RapidMACS columns of Table 1, S3's RapidMACS rows, S4's speedups, and S5.** `results.tsv` carries per-row parity verdicts; `stages.tsv` carries the S5 stage medians |
 
 Two notes on what is and is not here.
 

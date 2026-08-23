@@ -48,7 +48,7 @@ EXPECTED_SUMMITS_MD5=c3805d1d3744ed78e3d589a523ad0b09
 # cache, medians of three). Printed for orientation only; nothing asserts them,
 # because timings are hardware-dependent.
 REF_MACS3=747.55
-declare -A REF_RAPID=([1]=57.87 [4]=24.13 [24]=16.37)
+declare -A REF_RAPID=([1]=58.93 [4]=24.44 [24]=16.35)
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 

@@ -512,6 +512,7 @@ should share the host during measurement.
 ## 14. Published results
 
 The six input configurations reported in Table 1 of the Applications Note.
+RapidMACS timings are v1.0.1; the MACS3 comparators are unchanged by that release.
 Complete-program wall time in seconds, medians of three recorded warm-cache
 runs after one unrecorded warm-up, on one 13th-generation Intel Core i9-13900KF
 host with every input, output, and temporary file on the same NVMe device.
@@ -521,15 +522,15 @@ narrowPeak and summit files.
 
 | Configuration | MACS3 v3.0.3 | T=1 | T=4 | T=24 | Peaks |
 |---|---:|---:|---:|---:|---:|
-| scATAC-seq, 10x fragments | 747.55 | 57.87 (12.9x) | 24.13 (31.0x) | 16.37 (45.7x) | 50,003 |
-| scATAC-seq, Chromap fragments | 758.62 | 58.88 (12.9x) | 25.38 (29.9x) | 16.12 (47.1x) | 50,274 |
-| Bulk ATAC-seq, ENCODE BAM | 146.63 | 41.49 (3.5x) | 13.14 (11.2x) | 7.28 (20.1x) | 74,000 |
-| Bulk ATAC-seq, Chromap BAM | 122.92 | 32.10 (3.8x) | 10.74 (11.4x) | 6.77 (18.2x) | 78,574 |
-| ChIP-seq, ENCODE BAM + input control | 616.90 | 96.39 (6.4x) | 27.23 (22.7x) | 12.11 (50.9x) | 33,985 |
-| CUT&RUN, GEO BAM + IgG control | 64.74 | 9.81 (6.6x) | 2.98 (21.7x) | 1.99 (32.5x) | 9,097 |
+| scATAC-seq, 10x fragments | 747.55 | 58.93 (12.7x) | 24.44 (30.6x) | 16.35 (45.7x) | 50,003 |
+| scATAC-seq, Chromap fragments | 758.62 | 59.81 (12.7x) | 25.58 (29.7x) | 16.31 (46.5x) | 50,274 |
+| Bulk ATAC-seq, ENCODE BAM | 146.63 | 41.94 (3.5x) | 13.21 (11.1x) | 7.47 (19.6x) | 74,000 |
+| Bulk ATAC-seq, Chromap BAM | 122.92 | 32.51 (3.8x) | 10.84 (11.3x) | 6.56 (18.7x) | 78,574 |
+| ChIP-seq, ENCODE BAM + input control | 616.90 | 97.08 (6.4x) | 27.38 (22.5x) | 12.18 (50.6x) | 33,985 |
+| CUT&RUN, GEO BAM + IgG control | 64.74 | 9.94 (6.5x) | 2.99 (21.7x) | 2.01 (32.2x) | 9,097 |
 
-Peak resident set size spans 0.46-5.44 GiB against 0.35-2.74 GiB for MACS3.
-Internal T=1 to T=24 scaling spans 3.5-8.0x.
+Peak resident set size spans 0.46-5.40 GiB against 0.35-2.74 GiB for MACS3.
+Internal T=1 to T=24 scaling spans 3.6-8.0x.
 
 All 72 measured invocations, every repetition with its per-run output
 checksums, the stage profiles, host metadata, and the SHA-256 of each MACS3
