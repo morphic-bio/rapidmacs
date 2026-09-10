@@ -111,6 +111,56 @@ BED3, bedGraph, and score columns are unaffected.
 for Poisson scoring and uses its float32 p/q-table arithmetic. Five-decimal
 rounding is confined to diagnostic bedGraph output.
 
+## Test dataset
+
+A public dataset, the exact command to run it on, and the output you should
+get. This is the quickest end-to-end check that a build works.
+
+**Test data.** The 10x Genomics Cell Ranger ARC PBMC 3k ATAC fragments,
+53,015,732 rows, 537,308,082 bytes,
+SHA-256 `0189df1de4894f10f48ffb905da4966cefc2466dc5fdd76ee2905244dd5a8dd7`:
+
+```sh
+curl -fLO https://cf.10xgenomics.com/samples/cell-arc/2.0.0/pbmc_unsorted_3k/pbmc_unsorted_3k_atac_fragments.tsv.gz
+```
+
+**Input.** A fragments TSV, plain or gzipped, exactly as Cell Ranger ARC and
+Chromap write it: `chrom`, `start`, `end`, `barcode`, `count`. The seven-column
+Chromap bulk form is also accepted; the schema is detected automatically.
+
+**Run.**
+
+```sh
+make -j
+bin/rapidmacs --preset shiftTAG -f FRAG \
+  -t pbmc_unsorted_3k_atac_fragments.tsv.gz \
+  -g hs -n atac -p 1e-5 \
+  --bdgpeakcall-min-len 200 --bdgpeakcall-max-gap 30 \
+  --peak-caller-threads 8 \
+  --macs3-frag-narrowpeak atac.narrowPeak \
+  --macs3-frag-summits atac.summits.bed
+```
+
+**Output.** Two files. `atac.narrowPeak` is ENCODE narrowPeak: chromosome,
+start, end, peak name, score, strand, signal, p-score, q-score, summit offset.
+`atac.summits.bed` is BED5, one row per summit. Expect **50,003 peaks** and
+these exact checksums, which are also what MACS3 v3.0.3 produces from the same
+input:
+
+```
+$ wc -l < atac.narrowPeak
+50003
+$ md5sum atac.narrowPeak atac.summits.bed
+2c0de7c506514b0afef1e4339c386c9f  atac.narrowPeak
+c3805d1d3744ed78e3d589a523ad0b09  atac.summits.bed
+```
+
+Runtime is about 20 s at 8 threads on the reference host. If the checksums
+differ, please open an issue rather than working around it.
+
+More worked examples, including ChIP-seq with a control and calling peaks from
+your own C++ program, are in [docs/walkthroughs.md](docs/walkthroughs.md).
+
 ## Container
 
 ```sh
