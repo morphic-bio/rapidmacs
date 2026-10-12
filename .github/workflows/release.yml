@@ -69,7 +69,7 @@ jobs:
           docker cp "$id:/src/lib/librapidmacs.a" stage/rapidmacs/lib/
           docker rm "$id" >/dev/null
           cp -r include stage/rapidmacs/include
-          cp LICENSE NOTICE README.md stage/rapidmacs/
+          cp LICENSE NOTICE README.md CHANGELOG.md stage/rapidmacs/
           cp -r docs stage/rapidmacs/docs
 
       - name: Package
@@ -148,34 +148,4 @@ jobs:
           files: |
             dist/*.tar.gz
             dist/*.tar.gz.sha256
-          body: |
-            RapidMACS ${{ github.event.inputs.tag || github.ref_name }} — narrow peak
-            calling with output byte-identical to MACS3 v3.0.3.
-
-            **Container**
-
-            ```sh
-            docker pull ghcr.io/${{ github.repository }}:${{ github.event.inputs.tag || github.ref_name }}
-            ```
-
-            Multi-arch (amd64 and arm64). `rapidmacs` is the entrypoint.
-
-            **Tarballs**
-
-            `rapidmacs-<version>-linux-<arch>.tar.gz` unpacks to `bin/rapidmacs`,
-            `lib/librapidmacs.a`, `include/rapidmacs/`, and `docs/`. Verify with
-            the accompanying `.sha256`.
-
-            ```sh
-            tar xzf rapidmacs-<version>-linux-<arch>.tar.gz
-            g++ -std=c++11 -Irapidmacs-<version>-linux-<arch>/include my_tool.cc \\
-              rapidmacs-<version>-linux-<arch>/lib/librapidmacs.a \\
-              -lhts -lm -lz -lpthread -fopenmp
-            ```
-
-            **Reproducing the published benchmark**
-
-            See `paper/README.md`. `paper/scripts/run_10x_pbmc_example.sh`
-            reproduces the single-cell ATAC row of Table 1 from a public
-            dataset and fails unless the output matches the published
-            checksums.
+          body_path: docs/RELEASE_NOTES_${{ github.event.inputs.tag || github.ref_name }}.md

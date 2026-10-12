@@ -266,7 +266,9 @@ FIXTURE_FRAGS=/path/to/fragments.tsv.gz make test-macs3-frag-100k
 
 ## Documentation
 
-- [CHANGELOG.md](CHANGELOG.md) — unreleased correctness fixes.
+- [CHANGELOG.md](CHANGELOG.md) — version history and correctness fixes.
+- [docs/RELEASE_NOTES_v1.0.2.md](docs/RELEASE_NOTES_v1.0.2.md) — singleton
+  BED strands, P-mode summit scores, and capped FRAG counts.
 
 - [docs/RELEASE_NOTES_v1.0.1.md](docs/RELEASE_NOTES_v1.0.1.md) — correctness
   fixes in the v1.0.1 patch release.

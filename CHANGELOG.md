@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.2 (proposed, unreleased)
+## 1.0.2 (2026-10-12)
 
 - Fix the BED single-end background total under numeric duplicate removal.
   In v1.0.1, a chromosome strand containing exactly one tag contributed to
@@ -31,5 +31,5 @@ MACS3 for caps 1, 2, 5, and no cap through the CLI and four library entry points
 The cap-1 and cap-2 goldens fail on v1.0.1. Existing 100K legacy/FRAG,
 ChIP-seq, and CUT&RUN goldens remain byte-identical.
 
-No release or tag has been created. Consumers must update their RapidMACS
-source revision and rebuild the CLI or rebuild and relink `librapidmacs`.
+Consumers must update their RapidMACS source revision to `v1.0.2` and rebuild
+the CLI or rebuild and relink `librapidmacs`.
