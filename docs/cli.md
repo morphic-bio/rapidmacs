@@ -95,7 +95,7 @@ stream that must be inflated serially.
 |---|---|---|
 | `--no-macs3-frag-summit-parity` | parity **on** | Disables byte-identical summit mode in exchange for lower memory. Diverges from MACS3 on ~2% of summit positions at PBMC scale (max ~222 bp). BED3, bedGraph, and score columns are unaffected. |
 | `--frag-pileup-macs3-uint8-counts` | — | Coerce fragment weights through uint8 as MACS3's PETrackII does. Recommended when comparing against `macs3 pileup`. |
-| `--frag-pileup-max-count N` | 0 | Cap the count column like MACS3 `--max-count`. Applies to `--frag-span-pileup-bdg` only. |
+| `--frag-pileup-max-count N` | 0 | Cap the count column like MACS3 `--max-count` for FRAG pileups, background totals, and summit endpoints, including the MACS3 peak pipeline and diagnostic bedGraphs. |
 
 Leave summit parity on unless you are memory-constrained and do not need
 byte-identical summits.

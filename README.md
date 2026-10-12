@@ -238,6 +238,10 @@ tag under duplicate removal, and writes the summit score selected by
 with `--keep-dup 1`, `2`, and `all`; see [CHANGELOG.md](CHANGELOG.md) for the
 v1.0.1 corrections.
 
+FRAG count caps (`--frag-pileup-max-count N`, equivalent to MACS3
+`--max-count N`) apply to pileups, background totals, and summit placement.
+Regression goldens cover caps 1, 2, and 5 as well as uncapped input.
+
 Because the files are identical, the substitution can be made part-way through
 an established analysis without putting earlier comparisons in question.
 
@@ -247,6 +251,7 @@ an established analysis without putting earlier comparisons in question.
 make test                    # unit + ATAC + ChIP-seq + CUT&RUN smokes
 make test-unit               # C++ unit tests
 make test-singleton-parity   # BED singleton strands, P/q modes and keep-dup
+make test-frag-max-count     # FRAG caps 1/2/5 and uncapped original-MACS3 goldens
 make test-macs3-frag-100k    # FRAG golden
 make test-chipseq            # public ENCODE BAMPE treatment/input fixture
 make test-cutrun             # public GEO BAMPE CTCF/IgG fixture

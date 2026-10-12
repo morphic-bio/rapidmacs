@@ -38,7 +38,7 @@ for src in "${REPO_ROOT}"/tests/unit/*.cc; do
     failed=$((failed + 1))
     continue
   fi
-  if ! "${out}" > "${OUTDIR}/${name}.run.log" 2>&1; then
+  if ! RAPIDMACS_TEST_ROOT="${REPO_ROOT}" "${out}" > "${OUTDIR}/${name}.run.log" 2>&1; then
     echo "FAIL run ${name}" >&2
     cat "${OUTDIR}/${name}.run.log" >&2
     failed=$((failed + 1))

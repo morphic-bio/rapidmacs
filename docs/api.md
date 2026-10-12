@@ -94,7 +94,7 @@ mean to.
 | `byte_parity_summits` | `true` | reproduce MACS3's per-event `pos_array` summit tie-break |
 | `macs3_float_score_math` | `true` | MACS3's float32 p/q-table arithmetic |
 | `macs3_uint8_counts` | `true` | coerce fragment weights through uint8, as PETrackII does |
-| `frag_pileup_max_count` | `0` | cap the count column; 0 disables |
+| `frag_pileup_max_count` | `0` | cap counts for pileups, background totals, and summit endpoints, matching MACS3 `--max-count`; 0 disables |
 | `score_pseudocount` | `0.0` | `bdgcmp -p` |
 | `treatment_fragment_length_bp` | `0.0` | override the derived mean fragment length |
 

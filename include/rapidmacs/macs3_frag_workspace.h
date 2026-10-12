@@ -13,6 +13,8 @@ namespace chromap {
 namespace peaks {
 
 struct Macs3FragWorkspaceParams {
+  // Cap each row's count for pileups, background totals, and summit
+  // endpoints, matching MACS3's parser-time --max-count (0 disables).
   int32_t frag_pileup_max_count = 0;
   bool macs3_uint8_counts = true;
   int64_t effective_genome_size = 2913022398LL;

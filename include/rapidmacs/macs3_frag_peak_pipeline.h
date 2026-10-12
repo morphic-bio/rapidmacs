@@ -31,6 +31,8 @@ struct Macs3FragPeakPipelineParams {
   bool macs3_float_score_math = true;
   int32_t min_length = 200;
   int32_t max_gap = 30;
+  // MACS3 --max-count: applies to all count uses, including summit
+  // endpoint multiplicities; 0 disables the cap.
   int32_t frag_pileup_max_count = 0;
   bool macs3_uint8_counts = true;
   int64_t effective_genome_size = 2913022398LL;

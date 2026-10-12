@@ -124,3 +124,24 @@ MACS3=/path/to/macs3 UPDATE_GOLDENS=1 tests/run_singleton_parity.sh
 Reference generation checks the MACS3 version and copies only its output;
 RapidMACS output is never used to generate goldens. `RAPIDMACS` can select a
 different candidate executable, for example to demonstrate failure on v1.0.1.
+
+## Fragment count caps
+
+`capped_counts.fragments.tsv` contains 120 synthetic fragments on two
+chromosomes, with counts from 1 through 15 and three separated peak regions.
+Overlapping fragments create tied summit plateaus whose selection depends on
+endpoint multiplicity. At caps 1 and 2, v1.0.1 selects a different summit for
+one of the three peaks. The uncapped case protects existing behavior.
+
+Original MACS3 3.0.3 generated `tests/golden/capped_counts/{0,1,2,5}/` with
+`callpeak -f FRAG -g 2913022398 -p 1e-5 --min-length 200 --max-gap 30
+--max-count N -n capped`. Here 0 disables the cap. Revalidate or regenerate:
+
+```sh
+MACS3=/path/to/macs3 tests/run_frag_max_count_parity.sh
+MACS3=/path/to/macs3 UPDATE_GOLDENS=1 tests/run_frag_max_count_parity.sh
+```
+
+The CLI smoke compares both complete files. `test_frag_max_count.cc` also
+compares those goldens through the in-memory fragment pipeline, event iterator,
+sorted iterator/batch merge, and direct sweep workspace, using two threads.

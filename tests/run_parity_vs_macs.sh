@@ -9,8 +9,8 @@
 #
 # Both consume the same fragments TSV. Threshold semantics are aligned:
 #   --bdgpeakcall-cutoff 5  ⇔  -log10(p) > 5  ⇔  -p 1e-5
-# At the BED3 (chrom, start, end) level RapidMACS has been validated to be
-# byte-identical to MACS3 on the 100K fixture and on the full PBMC 3k dataset.
+# Complete narrowPeak and summit files must be byte-identical to MACS3.
+# BED3 statistics below also describe the MACS2 comparison.
 #
 # This script also runs MACS2 with the same -f BEDPE-equivalent path for a
 # version-bump noise-floor reference (MACS3 vs MACS2 on the same input).
@@ -151,8 +151,7 @@ P_MACS2="${OUTDIR}/macs2_out/${NAME}_peaks.narrowPeak"
 S_RAPIDMACS="${lib_prefix}.summits.bed"
 S_MACS3="${OUTDIR}/macs3_out/${NAME}_summits.bed"
 
-# BED3 extraction (chrom, start, end only — narrowPeak score columns are NOT
-# yet byte-identical).
+# BED3 extraction for overlap statistics; full-file identity is checked below.
 bed3() {
   awk 'BEGIN{FS=OFS="\t"} !/^track/ && !/^#/ && NF>=3 { print $1, $2+0, $3+0 }' "$1" |
     LC_ALL=C sort -k1,1 -k2,2n

@@ -69,7 +69,7 @@ void Usage() {
          "  --frag-span-pileup-bdg  Fragment-span pileup bedGraph ([start,end) weighted by "
          "col5; matches MACS3 `pileup -f FRAG` when --frag-pileup-macs3-uint8-counts is set)\n"
          "  --frag-pileup-max-count N  Cap col5 like MACS3 --max-count (0 = no cap; applies "
-         "to --frag-span-pileup-bdg only)\n"
+         "to FRAG pileups, background totals, and summit endpoints)\n"
          "  --frag-pileup-macs3-uint8-counts  Coerce fragment weights through uint8 (MACS3 "
          "PETrackII); recommended for byte-for-byte parity vs macs3 pileup\n"
          "  --no-macs3-frag-summit-parity  Disable byte-identical-summit mode (default ON);\n"

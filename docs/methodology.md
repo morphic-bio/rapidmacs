@@ -259,7 +259,10 @@ boundaries.
 
 Default parity mode reconstructs `pos_array` per chromosome from
 count-duplicated treatment endpoints and the relevant local/control endpoint
-windows, takes their sorted union, and splits tied treatment plateaus at every
+windows. For FRAG input, endpoint multiplicities use the count after
+`--frag-pileup-max-count`, just as pileups and background totals do; MACS3
+applies its equivalent `--max-count` during parsing. The reconstruction takes
+their sorted union and splits tied treatment plateaus at every
 interior position before applying MACS3's median tie rule. This mode produced
 zero summit-coordinate differences across 50,274 peaks in the full PBMC ATAC
 validation and byte-identical controlled-assay summit files.

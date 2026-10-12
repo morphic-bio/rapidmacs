@@ -1074,8 +1074,8 @@ bool AddMacs3FragWorkspaceFragment(Macs3FragPeakWorkspace* workspace,
     ev.lambda_end_window_events.push_back(Macs3FragEvent{rr, -w});
   }
 
-  // Byte-parity summits: capture per-chrom count-duplicated endpoints
-  // (raw count, matching MACS3 FragParser instance count).
+  // MACS3 caps the count while parsing. Summit endpoints must use the
+  // same effective multiplicity as the pileup and background totals.
   if (params.byte_parity_summits &&
       params.capture_raw_pos_array_endpoints) {
     if (chrom_id >= workspace->pos_array_starts_capture.size()) {
@@ -1084,7 +1084,7 @@ bool AddMacs3FragWorkspaceFragment(Macs3FragPeakWorkspace* workspace,
     }
     std::vector<int32_t>& fs = workspace->pos_array_starts_capture[chrom_id];
     std::vector<int32_t>& fe = workspace->pos_array_ends_capture[chrom_id];
-    for (int32_t k = 0; k < count; ++k) {
+    for (int32_t k = 0; k < w; ++k) {
       fs.push_back(start);
       fe.push_back(end);
     }
@@ -1130,7 +1130,7 @@ bool BuildMacs3FragTracksFromSortedFragments(
     const size_t i = static_cast<size_t>(ii);
     ChromFragments& ch = by_chrom->at(i);
     int32_t previous_start = -1;
-    size_t raw_endpoint_count = 0;
+    size_t endpoint_count = 0;
     for (const Fragment& f : ch.frags) {
       if (f.start < previous_start || f.end <= f.start || f.count <= 0) {
         ok[i] = 0;
@@ -1142,12 +1142,12 @@ bool BuildMacs3FragTracksFromSortedFragments(
       if (w == 0) continue;
       if (params.byte_parity_summits &&
           params.capture_raw_pos_array_endpoints) {
-        const size_t c = static_cast<size_t>(f.count);
-        if (raw_endpoint_count > std::numeric_limits<size_t>::max() - c) {
+        const size_t c = static_cast<size_t>(w);
+        if (endpoint_count > std::numeric_limits<size_t>::max() - c) {
           ok[i] = 0;
           break;
         }
-        raw_endpoint_count += c;
+        endpoint_count += c;
       }
       const int32_t row_count = RowCountForMacsTotals(
           f.count, params.frag_pileup_max_count, params.macs3_uint8_counts);
@@ -1174,15 +1174,13 @@ bool BuildMacs3FragTracksFromSortedFragments(
         params.capture_raw_pos_array_endpoints) {
       std::vector<int32_t>& fs = workspace->pos_array_starts_capture[i];
       std::vector<int32_t>& fe = workspace->pos_array_ends_capture[i];
-      fs.reserve(raw_endpoint_count);
-      fe.reserve(raw_endpoint_count);
+      fs.reserve(endpoint_count);
+      fe.reserve(endpoint_count);
       for (const Fragment& f : ch.frags) {
-        if (EffectiveFragWeight(f.count, params.frag_pileup_max_count,
-                                params.macs3_uint8_counts) == 0) {
-          continue;
-        }
-        fs.insert(fs.end(), static_cast<size_t>(f.count), f.start);
-        fe.insert(fe.end(), static_cast<size_t>(f.count), f.end);
+        const int32_t w = EffectiveFragWeight(
+            f.count, params.frag_pileup_max_count, params.macs3_uint8_counts);
+        fs.insert(fs.end(), static_cast<size_t>(w), f.start);
+        fe.insert(fe.end(), static_cast<size_t>(w), f.end);
       }
     }
     std::vector<WeightedEndpoint>().swap(starts);

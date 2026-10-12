@@ -219,8 +219,8 @@ bool Macs3FragSweepWorkspace::AddFragment(uint32_t chrom_id, int32_t start,
   }
 
   // Byte-parity summits: capture per-chrom count-duplicated endpoints.
-  // Each fragment with raw count=N contributes N copies of (start, end)
-  // (matches MACS3 FragParser, which creates N PETrackI instances).
+  // MACS3 caps counts while parsing into PETrackII, so use the same
+  // effective multiplicity here as in pileups and background totals.
   if (params_.byte_parity_summits &&
       params_.capture_raw_pos_array_endpoints) {
     if (cur_chrom_id_ >= static_cast<int32_t>(frag_starts_.size())) {
@@ -229,7 +229,7 @@ bool Macs3FragSweepWorkspace::AddFragment(uint32_t chrom_id, int32_t start,
     }
     std::vector<int32_t>& fs = frag_starts_[cur_chrom_id_];
     std::vector<int32_t>& fe = frag_ends_[cur_chrom_id_];
-    for (int32_t k = 0; k < count; ++k) {
+    for (int32_t k = 0; k < w; ++k) {
       fs.push_back(start);
       fe.push_back(end);
     }
