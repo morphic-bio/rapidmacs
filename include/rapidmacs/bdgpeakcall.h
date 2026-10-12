@@ -136,6 +136,8 @@ bool WriteMacs3FragNarrowPeakRows(
 void FilterMacs3FragNarrowPeakRowsByFoldEnrichment(
     std::vector<Macs3FragNarrowPeakRow>* rows, double cutoff);
 
+// Select the summit metric explicitly: MACS3 callpeak uses pscore under
+// --pvalue and qscore under --qvalue. The default preserves older callers.
 bool WriteMacs3FragNarrowPeakRowsWithScoreCap(
     std::vector<Macs3FragNarrowPeakRow>* rows,
     const std::string& path_narrowpeak, const std::string& path_summits_bed,
@@ -143,7 +145,8 @@ bool WriteMacs3FragNarrowPeakRowsWithScoreCap(
     const std::string& name_prefix,
     bool narrowpeak_score_uses_qvalue,
     bool cap_narrowpeak_score,
-    bool macs3_float_output = false);
+    bool macs3_float_output = false,
+    bool summit_score_uses_qvalue = true);
 
 // Build MACS3-compatible pqtable: genome-wide BH-adjusted -log10(qvalue)
 // for each unique -log10(pvalue) seen across all ppois track segments.

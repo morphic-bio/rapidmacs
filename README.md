@@ -232,6 +232,12 @@ byte — 12,923 and 9,181 rows respectively on the full PBMC 100K workflow input
 Commands and checksums are in
 [paper/WORKFLOW-COMPATIBILITY.md](paper/WORKFLOW-COMPATIBILITY.md).
 
+The BED compatibility path also covers chromosome strands containing a single
+tag under duplicate removal, and writes the summit score selected by
+`--pvalue` or `--qvalue`. Small original-MACS3 3.0.3 goldens exercise both modes
+with `--keep-dup 1`, `2`, and `all`; see [CHANGELOG.md](CHANGELOG.md) for the
+v1.0.1 corrections.
+
 Because the files are identical, the substitution can be made part-way through
 an established analysis without putting earlier comparisons in question.
 
@@ -240,6 +246,7 @@ an established analysis without putting earlier comparisons in question.
 ```sh
 make test                    # unit + ATAC + ChIP-seq + CUT&RUN smokes
 make test-unit               # C++ unit tests
+make test-singleton-parity   # BED singleton strands, P/q modes and keep-dup
 make test-macs3-frag-100k    # FRAG golden
 make test-chipseq            # public ENCODE BAMPE treatment/input fixture
 make test-cutrun             # public GEO BAMPE CTCF/IgG fixture
@@ -253,6 +260,8 @@ FIXTURE_FRAGS=/path/to/fragments.tsv.gz make test-macs3-frag-100k
 ```
 
 ## Documentation
+
+- [CHANGELOG.md](CHANGELOG.md) — unreleased correctness fixes.
 
 - [docs/RELEASE_NOTES_v1.0.1.md](docs/RELEASE_NOTES_v1.0.1.md) — correctness
   fixes in the v1.0.1 patch release.

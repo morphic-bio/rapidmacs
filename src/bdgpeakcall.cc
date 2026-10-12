@@ -1134,7 +1134,8 @@ bool WriteMacs3FragNarrowPeakRowsWithScoreCap(
     const std::string& name_prefix,
     bool narrowpeak_score_uses_qvalue,
     bool cap_narrowpeak_score,
-    bool macs3_float_output) {
+    bool macs3_float_output,
+    bool summit_score_uses_qvalue) {
   if (rows == nullptr || (path_narrowpeak.empty() && path_summits_bed.empty())) {
     return false;
   }
@@ -1202,14 +1203,13 @@ bool WriteMacs3FragNarrowPeakRowsWithScoreCap(
     if (fps == nullptr) return false;
     for (size_t i = 0; i < rows->size(); ++i) {
       const Macs3FragNarrowPeakRow& p = rows->at(i);
-      const double q_mlog =
-          macs3_float_output ? static_cast<float>(p.q_mlog) : p.q_mlog;
+      const double raw_score = summit_score_uses_qvalue ? p.q_mlog : p.p_mlog;
+      const double summit_score =
+          macs3_float_output ? static_cast<float>(raw_score) : raw_score;
       const std::string& name = names[i];
-      // MACS3's summits file always reports qscore, independently of which
-      // metric supplies narrowPeak column 5.
       if (std::fprintf(fps, "%s\t%d\t%d\t%s\t%.6g\n", p.chrom.c_str(),
                        static_cast<int>(p.summit),
-                       static_cast<int>(p.summit + 1), name.c_str(), q_mlog) < 0) {
+                       static_cast<int>(p.summit + 1), name.c_str(), summit_score) < 0) {
         std::fclose(fps);
         return false;
       }

@@ -66,7 +66,7 @@ CLI = $(BINDIR)/rapidmacs
 .PHONY: all clean rapidmacs librapidmacs \
         test test-unit \
         test-legacy-streaming-100k test-macs3-frag-100k \
-        test-chipseq test-cutrun
+        test-chipseq test-cutrun test-keepdup test-singleton-parity
 
 all: rapidmacs
 
@@ -111,11 +111,14 @@ test-cutrun: $(CLI)
 test-keepdup: $(CLI)
 	tests/run_keepdup_regression.sh
 
+test-singleton-parity: $(CLI)
+	tests/run_singleton_parity.sh
+
 # Unit tests (compiled binaries under build/tests/, run sequentially).
 test-unit: $(LIB)
 	tests/run_unit_tests.sh
 
-test: test-unit test-keepdup test-legacy-streaming-100k test-macs3-frag-100k \
+test: test-unit test-keepdup test-singleton-parity test-legacy-streaming-100k test-macs3-frag-100k \
       test-chipseq test-cutrun
 
 clean:

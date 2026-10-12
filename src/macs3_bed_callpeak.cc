@@ -227,8 +227,14 @@ int64_t FilterDupSorted(std::vector<int32_t>* v, int keep) {
   if (v == nullptr) {
     return 0;
   }
-  if (keep < 0 || v->size() <= 1) {
+  if (keep < 0) {
     return static_cast<int64_t>(v->size());
+  }
+  // MACS3 FWTrack.filter_dup retains singleton strands but omits them
+  // from the recomputed total used for genome-wide background lambda.
+  // Test the size before filtering: a duplicate run reduced to one counts.
+  if (v->size() <= 1) {
+    return 0;
   }
   size_t w = 0;
   size_t i = 0;
@@ -769,7 +775,7 @@ bool RunMacs3BedCallPeak(const std::string& bed_input,
   }
   if (!WriteMacs3FragNarrowPeakRowsWithScoreCap(
           &rows, narrowpeak_out, summits_out, &pqtable, params.name_prefix,
-          q_mode, false, true)) {
+          q_mode, false, true, q_mode)) {
     if (error_message) *error_message = "failed to write BED narrowPeak/summits";
     return false;
   }

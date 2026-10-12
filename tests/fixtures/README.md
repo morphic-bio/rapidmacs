@@ -101,3 +101,26 @@ macs3 callpeak -t tests/fixtures/cutrun_SRR14255054.chr21_20m_30m.bam \
 The smoke tests require byte-identical narrowPeak and summit files.  The full
 benchmark harness applies the same full-file MD5 parity gate to every measured
 run before it writes the timing summary.
+
+## Single-end singleton strands
+
+`singleton_strands.bed` is a synthetic 85-row BED6 fixture: three dense peaks,
+singletons on both strands (including a singleton opposite a dense strand),
+and a two-copy duplicate run on its own chromosome. MACS3 3.0.3's filtered
+background totals are 73 with `--keep-dup 1`, 77 with `2`, and 85 with `all`.
+Singleton tags remain in pileups; a duplicate run reduced to one still counts.
+
+`tests/run_singleton_parity.sh` checks all columns of narrowPeak and summits
+against `tests/golden/singleton_strands/`. It uses `--nomodel --shift -100
+--extsize 200 -g 10000`, P cutoff `1e-5` or q cutoff `0.05`, and name `singleton`.
+The small effective genome makes the filtered total affect peak scores.
+To revalidate with an original MACS3 3.0.3 executable (or a container wrapper):
+
+```sh
+MACS3=/path/to/macs3 tests/run_singleton_parity.sh
+MACS3=/path/to/macs3 UPDATE_GOLDENS=1 tests/run_singleton_parity.sh
+```
+
+Reference generation checks the MACS3 version and copies only its output;
+RapidMACS output is never used to generate goldens. `RAPIDMACS` can select a
+different candidate executable, for example to demonstrate failure on v1.0.1.

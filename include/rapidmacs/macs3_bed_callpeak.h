@@ -34,6 +34,8 @@ struct Macs3BedCallPeakParams {
 
 struct Macs3BedCallPeakStats {
   int64_t total_tags = 0;
+  // MACS3's background total; duplicate filtering retains singleton
+  // strands in the pileup but excludes them from this count.
   int64_t tags_after_filtering = 0;
   int32_t detected_tag_size = 0;
   int32_t resolved_min_length = 0;
